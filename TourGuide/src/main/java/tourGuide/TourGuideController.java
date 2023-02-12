@@ -1,18 +1,18 @@
 package tourGuide;
 
-import java.util.List;
-
+import com.jsoniter.output.JsonStream;
+import gpsUtil.location.Location;
+import gpsUtil.location.VisitedLocation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.jsoniter.output.JsonStream;
-
-import gpsUtil.location.VisitedLocation;
 import tourGuide.service.TourGuideService;
 import tourGuide.user.User;
 import tripPricer.Provider;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 public class TourGuideController {
@@ -43,7 +43,7 @@ public class TourGuideController {
     @RequestMapping("/getNearbyAttractions") 
     public String getNearbyAttractions(@RequestParam String userName) {
     	VisitedLocation visitedLocation = tourGuideService.getUserLocation(getUser(userName));
-    	return JsonStream.serialize(tourGuideService.getNearByAttractions(visitedLocation));
+    	return JsonStream.serialize(tourGuideService.getNearByAttractionsFiveCloser(visitedLocation,tourGuideService.getUser(userName)));
     }
     
     @RequestMapping("/getRewards") 
@@ -62,8 +62,16 @@ public class TourGuideController {
     	//        "019b04a9-067a-4c76-8817-ee75088c3822": {"longitude":-48.188821,"latitude":74.84371} 
     	//        ...
     	//     }
-    	
-    	return JsonStream.serialize("");
+    	List<User> userList = tourGuideService.getAllUsers();
+        List<String> result = new ArrayList<>();
+        userList.forEach(ul->{
+            Location location = tourGuideService.getUserLocation(ul).location;
+            String element = "{"+"\""+ul.getUserId()+"\""+": "+
+                    "{\"longitude\":"+location.longitude+","+
+                    "\"latitude\":"+location.latitude+"}";
+            result.add(element);
+        });
+    	return JsonStream.serialize(result);
     }
     
     @RequestMapping("/getTripDeals")

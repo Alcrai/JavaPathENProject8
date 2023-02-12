@@ -7,9 +7,10 @@ import gpsUtil.GpsUtil;
 import rewardCentral.RewardCentral;
 import tourGuide.service.RewardsService;
 
+import java.util.Locale;
+
 @Configuration
 public class TourGuideModule {
-	
 	@Bean
 	public GpsUtil getGpsUtil() {
 		return new GpsUtil();
